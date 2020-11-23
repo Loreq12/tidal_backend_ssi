@@ -1,8 +1,1 @@
-[
-  {
-    "id": 1,
-    "email": "ceziu1997@gmail.com",
-    "password": "zaq1@WSX",
-    "access": "ADMIN"
-  }
-]
+[{"id":0,"email":"a@b.pl","password":"haha","access":"ADMIN","blocked":false,"favourite":["0","2","3"]},{"id":1,"email":"c@d.pl","password":"dupa","access":"USER","blocked":false},{"id":2,"email":"e@f.pl","password":"dupa","access":"USER","blocked":false},{"id":3,"email":"i@j.pl","password":"qwerrty","access":"USER","blocked":false},{"id":4,"email":"i@j.pl","access":"USER","blocked":false}]
