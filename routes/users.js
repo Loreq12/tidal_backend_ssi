@@ -264,14 +264,9 @@ router.post('/uploadPicture', function (req,res, next){
   data_base[index].pictureFileDir = pictureDir;
 
   console.log(`UPLOADING FILE: `, req.body, req.files, " id: ", req.body.music_id)
-  try{
-    fs.writeFile(pictureDir, req.files.music_file.data, (err)=>{
-      if(err) throw err;
-    })
-  }catch (err){
-    res.status(500).json({'error': err})
-
-  }
+  fs.writeFile(pictureDir, req.files.picture_file.data, (err)=>{
+    if(err) throw err;
+  })
 
   let new_db = JSON.stringify(data_base)
   fs.writeFileSync('db/music.json', new_db, 'utf-8')
@@ -296,7 +291,7 @@ router.get('/picture', function (req,res,next){
     return;
   }
 
-  let dir = music.musicFileDir;
+  let dir = music.pictureFileDir;
   res.status(200).download(dir);
 })
 
@@ -321,7 +316,7 @@ router.get('/stream', function (req,res, next){
   let music_dir = data_base[index].musicFileDir;
   let readStream = fs.createReadStream(music_dir);
   readStream.pipe(res);
-  res.status(200).json({'result': 'streaming'})
+  res.status(200);
 })
 
 // authorisation: LOGGED
