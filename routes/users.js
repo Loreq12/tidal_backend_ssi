@@ -9,7 +9,6 @@ function createMusicEntry(id, title, author, duration, musicFileDir, pictureFile
     id: id,
     title: title,
     author: author,
-    duration: duration,
     musicFileDir: musicFileDir,
     pictureFileDir: pictureFileDir
   };
@@ -148,6 +147,7 @@ router.delete('/musiclist/', function(req, res, next) {
   res.status(200).send({'result':'entry deleted'})
 });
 
+//done
 // authorisation: ARTIST/ADMIN
 // add entry (with file upload?)
 router.post('/musiclist/', function (req,res, next){
@@ -156,6 +156,9 @@ router.post('/musiclist/', function (req,res, next){
     title: Joi.string().required(),
     author: Joi.string().required()
   })
+
+  console.log(req.body)
+
   const validation = schema.validate(req.body);
   if (validation.error) {
     res.status(400).json({'error': 'Validation Error'})
@@ -169,7 +172,7 @@ router.post('/musiclist/', function (req,res, next){
   let data_base = JSON.parse(db)
   console.log(data_base)
 
-  let new_id = 0
+  let new_id = 1
   data_base.forEach(music => {if(music.id >= new_id) new_id = music.id +1})
   data_base.push(createMusicEntry(new_id,
       req.body.title,
@@ -178,13 +181,14 @@ router.post('/musiclist/', function (req,res, next){
   let new_db = JSON.stringify(data_base)
   fs.writeFileSync('db/music.json', new_db, 'utf-8')
 
-  res.status(200).json({'result': 'Entry created'})
+  res.status(200).json({'id': new_id})
 })
 
 //var multer  = require('multer');
 // var upload = multer({ dest: 'upload/'});
 // var type = upload.single('music_file')
 
+//done
 // authorisation: ARTIST/ADMIN
 router.post('/uploadMusic', function (req,res, next){
   const schema = Joi.object({
@@ -229,6 +233,7 @@ router.post('/uploadMusic', function (req,res, next){
   res.status(200).json({'result': 'Data Uploaded'})
 })
 
+//done
 // authorisation: ARTIST/ADMIN
 router.post('/uploadPicture', function (req,res, next){
   const schema = Joi.object({
@@ -260,11 +265,11 @@ router.post('/uploadPicture', function (req,res, next){
     res.status(404).json({'error': 'Index not found'})
     return;
   }
-  let pictureDir = "./db/pictures/"+ req.files.picture_file.name;
+  let pictureDir = req.files.picture_file.name;
   data_base[index].pictureFileDir = pictureDir;
 
   console.log(`UPLOADING FILE: `, req.body, req.files, " id: ", req.body.music_id)
-  fs.writeFile(pictureDir, req.files.picture_file.data, (err)=>{
+  fs.writeFile('./db/pictures/' + pictureDir, req.files.picture_file.data, (err)=>{
     if(err) throw err;
   })
 
@@ -273,34 +278,34 @@ router.post('/uploadPicture', function (req,res, next){
   res.status(200).json({'result': 'Data Uploaded'})
 })
 
-router.get('/picture', function (req,res,next){
-  const schema = Joi.object({
-    music_id: Joi.number().required()
-  })
-  let validation = schema.validate(req.body);
-  if(validation.error){
-    res.status(400).json({'error': 'Validation Error'})
-    return;
-  }
-
-  const db = fs.readFileSync('db/music.json', 'utf-8')
-  let data_base = JSON.parse(db)
-  let music = data_base.find((elem)=>{return elem.id === Number(req.body.music_id)});
-  if(!music){
-    res.status(404).json({'error': 'Index not found'})
-    return;
-  }
-
-  let dir = music.pictureFileDir;
-  res.status(200).download(dir);
-})
+// router.get('/picture', function (req,res,next){
+//   const schema = Joi.object({
+//     music_id: Joi.number().required()
+//   })
+//   let validation = schema.validate(req.query);
+//   if(validation.error){
+//     res.status(400).json({'error': 'Validation Error'})
+//     return;
+//   }
+//
+//   const db = fs.readFileSync('db/music.json', 'utf-8')
+//   let data_base = JSON.parse(db)
+//   let music = data_base.find((elem)=>{return elem.id === Number(req.query.music_id)});
+//   if(!music){
+//     res.status(404).json({'error': 'Index not found'})
+//     return;
+//   }
+//
+//   let dir = music.pictureFileDir;
+//   res.status(200).download(dir);
+// })
 
 // authorisation: ALL
 router.get('/stream', function (req,res, next){
   const schema = Joi.object({
     music_id: Joi.number().required(),
   })
-  const validation = schema.validate(req.body);
+  const validation = schema.validate(req.query);
   if (validation.error) {
     res.status(400).json({'error': 'Validation Error'})
     return;
@@ -308,7 +313,7 @@ router.get('/stream', function (req,res, next){
 
   const db = fs.readFileSync('db/music.json', 'utf-8')
   let data_base = JSON.parse(db)
-  let index = data_base.findIndex((elem)=>{return elem.id === Number(req.body.music_id)});
+  let index = data_base.findIndex((elem)=>{return elem.id === Number(req.query.music_id)});
   if(index<0){
     res.status(404).json({'error': 'Index not found'})
     return;

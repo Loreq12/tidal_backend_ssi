@@ -2,6 +2,7 @@ var express = require('express');
 var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
+var cors = require('cors');
 //var multer = require('multer');
 var fileUpload = require('express-fileupload');
 //var upload = multer();
@@ -16,6 +17,8 @@ var app = express();
 
 app.use(logger('dev'));
 app.use(express.json());
+app.use(cors());
+app.use('/static', express.static(path.join(__dirname, 'db/pictures')));
 app.use(express.urlencoded({ extended: false }));       //urlencoded form-data
 //app.use(upload.array());                                        //normal form data CO^CHUJA sie tu dzieje
 app.use(express.static('public'));
