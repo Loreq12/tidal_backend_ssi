@@ -329,14 +329,14 @@ router.get('/favourite/', function (req,res, next){
   const schema = Joi.object({
     id: Joi.number().required(),
   })
-  const validation = schema.validate(req.body);
+  const validation = schema.validate(req.query);
   if (validation.error) {
     res.status(400).json({'error': 'Validation Error'})
     return;
   }
   const db = fs.readFileSync('db/user.json', 'utf-8')
   let data_base = JSON.parse(db)
-  let account = data_base.find((elem)=>{return elem.id == req.body.id;});
+  let account = data_base.find((elem)=>{return elem.id == req.query.id;});
 
   if(!account)
     res.status(404).send("Account not found")
@@ -365,7 +365,7 @@ router.post('/favourite/', function (req,res, next){
   else{
     let fav = account.favourite;
     if(!fav) fav = [];
-    fav.push(req.body.music_id);
+    fav.push(Number.parseInt(req.body.music_id));
     account.favourite = fav;
     let new_db = JSON.stringify(data_base)
     fs.writeFileSync('db/user.json', new_db, 'utf-8')
